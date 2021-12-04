@@ -5,6 +5,7 @@
  */
 $docDir = "manual";
 chdir($docDir);
+require('pulls.php');
 
 $lockFile = ".running.lock";
 if (file_exists($lockFile)) {
@@ -64,16 +65,13 @@ try {
         $hash = getManualHash($langCode);
         setManualHashLog($langCode, $hash);
     }
+    scheduleBuildPulls($docDir);
 } catch (\Exception $e) {
     echo $e->getMessage();
 } finally {
     unlink($lockFile);
 }
 
-
-// function createHashLog() {
-
-// }
 
 /**
  * 是否应该跳过该手册编译

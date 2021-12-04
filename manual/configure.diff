@@ -1,0 +1,34 @@
+diff --git a/configure.php b/configure.php
+index 313c150a..7787e7fb 100755
+--- a/configure.php
++++ b/configure.php
+@@ -66,6 +66,7 @@ Package-specific:
+   --disable-libxml-check         Disable the libxml 2.7.4+ requirement check
+   --with-php=PATH                Path to php CLI executable [detect]
+   --with-lang=LANG               Language to build [{$acd['LANG']}]
++  --with-lang-dir=LANGDIR        Language DIR to build [{$acd['LANG']}]
+   --with-partial=my-xml-id       Root ID to build (e.g. <book xml:id="MY-ID">) [{$acd['PARTIAL']}]
+   --disable-broken-file-listing  Do not ignore translated files in 
+                                  broken-files.txt
+@@ -430,6 +431,10 @@ foreach ($_SERVER['argv'] as $k => $opt) { // {{{
+             $ac['LANG'] = $v;
+             break;
+ 
++        case 'lang-dir':
++            $ac['LANGDIR'] = $v;
++            break;
++
+         case 'partial':
+             if ($v == "yes") {
+                 if (isset($_SERVER['argv'][$k+1])) {
+@@ -565,7 +570,9 @@ if (!file_exists($LANGDIR) || !is_readable($LANGDIR)) {
+     checkerror("No language directory found.");
+ }
+ 
+-$ac['LANGDIR'] = basename($LANGDIR);
++if(!$ac['LANGDIR']) {
++    $ac['LANGDIR'] = basename($LANGDIR);
++}
+ if ($ac['LANGDIR'] == 'trunk') {
+     $ac['LANGDIR'] = '../' . basename(dirname($LANGDIR)) . '/trunk';
+     $ac['EN_DIR'] = '../en/trunk';
