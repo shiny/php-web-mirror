@@ -43,7 +43,7 @@ try {
         }
 
         ob_start();
-        exec("php doc-base/configure.php --with-lang=${langCode} --output=doc-base/${langCode}.manual.xml", $result, $returnCode);
+        exec("php doc-base/configure.php --with-lang=${langCode} --with-lang-dir=${langCode} --output=doc-base/${langCode}.manual.xml", $result, $returnCode);
         $content = ob_get_clean();
         $dest = '../web-php/manual/'.$langCode;
         /**
@@ -55,13 +55,14 @@ try {
         } else if($returnCode === 0) {
             echo ucfirst($langCode)." manual validated\n";
         }
-        
-        exec("php phd/render.php --docbook doc-base/${langCode}.manual.xml --package PHP --format php --output=output-${langCode}", $result, $returnCode);
+        $outputDir = "output-${langCode}";
+        exec("rm -rf ${outputDir}");
+        exec("php phd/render.php --docbook doc-base/${langCode}.manual.xml --package PHP --format php --output=${outputDir}", $result, $returnCode);
         if (file_exists($dest)) {
             // watch out!
             exec("rm -rf ${dest}");
         }
-        symlink("../../${docDir}/output-${langCode}/php-web", $dest);
+        symlink("../../${docDir}/${outputDir}/php-web", $dest);
         $hash = getManualHash($langCode);
         setManualHashLog($langCode, $hash);
     }
