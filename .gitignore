@@ -1,0 +1,13 @@
+web-php/
+manual/phd/
+manual/doc-base/
+manual/en/
+manual/zh/
+manual/output-en/
+manual/output-zh/
+manual/output-zh-pr-*
+manual/*.lock
+.env
+.DS_Store
+sslcert/*.crt
+sslcert/*.key
