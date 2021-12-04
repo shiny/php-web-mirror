@@ -40,9 +40,12 @@ function scheduleBuildPulls($docDir) {
     $pulls = requestForPulls($token);
     foreach($pulls as $pull) {
         if (shouldBuildPull($pull)) {
-            echo "build ".$pull->merge_commit_sha, "\n";
-            $patchFile = 'pr-'.$pull->number.'.patch';
-            downloadPatchFile($patchFile, $pull->patch_url);
+            echo "build pull #".$pull->number, "\n";
+            $patchFile = 'pr-'.$pull->number.'.diff';
+
+            // 需要自行组装 URL，github.com 访问不畅，可能会失败
+            $diffUrl = "https://patch-diff.githubusercontent.com/raw/php/doc-zh/pull/{$pull->number}.diff";
+            downloadPatchFile($patchFile, $diffUrl);
             createPullRepo($pull->number, $patchFile);
             buildPull($pull->number, $docDir);
             setMergeCommitSha($pull->number, $pull->merge_commit_sha);
@@ -109,8 +112,12 @@ function downloadPatchFile($fileName, $patchUrl) {
  */
 function createPullRepo($number, $patchFile) {
     $pullRepoDir = "zh-pr-${number}";
-    exec("cp -a ./zh ${pullRepoDir}");
-    exec("git -C ${pullRepoDir} apply ../${patchFile}");
+    exec("rm -rf ${pullRepoDir}");
+    exec("cp -r ./zh ${pullRepoDir}");
+    exec("git -C ${pullRepoDir} apply ../${patchFile}", $result, $returnCode);
+    if ($returnCode === 1) {
+        throw new \Exception('补丁应用失败');
+    }
 }
 
 function buildPull($number, $docDir) {
@@ -129,12 +136,14 @@ function buildPull($number, $docDir) {
         echo $pullRepoDir." manual validated\n";
     }
     
-    exec("php phd/render.php --docbook doc-base/${pullRepoDir}.manual.xml --package PHP --format php --output=output-${pullRepoDir}", $result, $returnCode);
+    $outputDir = "output-${pullRepoDir}";
+    // watch out!
+    exec("rm -rf ${outputDir}");
+    exec("php phd/render.php --docbook doc-base/${pullRepoDir}.manual.xml --package PHP --format php --output=${outputDir}", $result, $returnCode);
     if (file_exists($dest)) {
-        // watch out!
-        exec("rm -rf ${dest}");
+        unlink($dest);
     }
-    symlink("../../${docDir}/output-${pullRepoDir}/php-web", $dest);
+    symlink("../../${docDir}/${outputDir}/php-web", $dest);
 }
 
 /**
@@ -147,5 +156,5 @@ function cleanPullBuild($number) {
         exec("rm -rf ${pullRepoDir}");
     }
     exec("rm -f doc-base/${pullRepoDir}.manual.xml");
-    exec("rm -f pr-${number}.patch");
+    exec("rm -f pr-${number}.diff");
 }

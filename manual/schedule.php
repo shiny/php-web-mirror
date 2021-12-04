@@ -25,7 +25,7 @@ $gitSources = [
 foreach($gitSources as $name => $repo) {
     $targetDir = "${name}";
     if (file_exists($targetDir)) {
-        exec("git -C $targetDir pull --rebase", $result, $returnCode);
+        exec("git -C $targetDir pull --quiet --rebase --autostash", $result, $returnCode);
     } else {
         # this is a github mirror in China
         exec("git clone https://github.com.cnpmjs.org/php/${repo}/ ${name}", $result, $returnCode);
