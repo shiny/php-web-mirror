@@ -64,6 +64,12 @@ try {
         }
         symlink("../../${docDir}/${outputDir}/php-web", $dest);
         $hash = getManualHash($langCode);
+        // send notification for doc-zh
+        if ($langCode === 'zh') {
+            $hashInShort = substr($hash, 0, 7);
+            sendNotification("已构建最新 master 分支 ${hashInShort}\n预览 https://phpdoc.u301.com");
+        }
+
         setManualHashLog($langCode, $hash);
     }
     scheduleBuildPulls($docDir);
@@ -108,4 +114,44 @@ function getManualHashLog($langCode) {
  */
 function setManualHashLog($langCode, $hash) {
     file_put_contents("hash-${langCode}.txt", $hash);
+}
+
+/**
+ * Send Notification for mastodon
+ */
+function sendNotification(string $content) {
+    $flag = strtoupper(getenv('MASTODON_NOTIFICATION'));
+    if ($flag !== 'ON') {
+        return false;
+    }
+
+    $endpoint = getenv('MASTODON_URI');
+    if (empty($endpoint)) {
+        return false;
+    } else {
+        $endpoint .= '/api/v1/statuses';
+    }
+
+    $token = getenv('MASTODON_TOKEN');
+
+    $hashtag = getenv('MASTODON_HASHTAG');
+    if ($hashtag) {
+        $content .= " #${hashtag}";
+    }
+    $ch = curl_init($endpoint);
+    curl_setopt_array($ch, [
+        CURLOPT_POST => true,
+        CURLOPT_HTTPHEADER => [
+            'Authorization: Bearer '.$token
+        ],
+        CURLOPT_RETURNTRANSFER => true,
+        CURLOPT_POSTFIELDS => [
+            'status' => $content
+        ]
+    ]);
+    $res = curl_exec($ch);
+    $httpcode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+    if ($httpcode != 200) {
+        echo $res;
+    }
 }

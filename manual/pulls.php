@@ -144,6 +144,8 @@ function buildPull($number, $docDir) {
         unlink($dest);
     }
     symlink("../../${docDir}/${outputDir}/php-web", $dest);
+
+    sendNotification("已构建 Pull Request ${number} \n预览 https://pr-${number}.phpdoc.u301.com");
 }
 
 /**

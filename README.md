@@ -26,3 +26,8 @@
 - hash-en.txt 英文版
 - hash-zh.txt 中文版
 - hash-pr-131.txt 中文手册 Pull Request #131 的 merge_commit_sha
+
+## 构建通知
+
+每次构建后，会在长毛象中发布 @php@tea.codes
+
