@@ -29,5 +29,7 @@
 
 ## 构建通知
 
-每次构建后，会在长毛象中发布 @php@tea.codes
+每次构建后，会在长毛象中发布 [@php@tea.codes](https://tea.codes/@php)
 
+## 镜像改进
+- 修复搜索 suggestion 内仅显示英文的问题
