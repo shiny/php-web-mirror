@@ -50,6 +50,12 @@ function scheduleBuildPulls($docDir) {
             buildPull($pull->number, $docDir);
             setMergeCommitSha($pull->number, $pull->merge_commit_sha);
             cleanPullBuild($pull->number);
+            sendNotification("https://github.com/php/doc-zh/pull/{$pull->number}
+{$pull->title}
+{$pull->body}
+
+作者：https://github.com/{$pull->user->login}
+预览 https://pr-{$pull->number}.phpdoc.u301.com/manual/zh/");
         }
     }
 }
@@ -144,8 +150,6 @@ function buildPull($number, $docDir) {
         unlink($dest);
     }
     symlink("../../${docDir}/${outputDir}/php-web", $dest);
-
-    sendNotification("已构建 Pull Request ${number} \n预览 https://pr-${number}.phpdoc.u301.com");
 }
 
 /**

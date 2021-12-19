@@ -67,7 +67,7 @@ try {
         // send notification for doc-zh
         if ($langCode === 'zh') {
             $hashInShort = substr($hash, 0, 7);
-            sendNotification("已构建最新 master 分支 ${hashInShort}\n预览 https://phpdoc.u301.com");
+            sendNotification("已构建最新 master 分支 ${hashInShort}\n预览 https://phpdoc.u301.com/manual/zh/");
         }
 
         setManualHashLog($langCode, $hash);
