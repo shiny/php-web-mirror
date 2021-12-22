@@ -7,6 +7,9 @@ $docDir = "manual";
 chdir($docDir);
 require('pulls.php');
 
+// 默认 5 分钟超时
+const TIMEOUT = 5 * 60;
+
 $lockFile = ".running.lock";
 if (file_exists($lockFile)) {
     echo "上个任务还在运行中\n";
@@ -144,6 +147,7 @@ function sendNotification(string $content) {
         CURLOPT_HTTPHEADER => [
             'Authorization: Bearer '.$token
         ],
+        CURLOPT_TIMEOUT => TIMEOUT,
         CURLOPT_RETURNTRANSFER => true,
         CURLOPT_POSTFIELDS => [
             'status' => $content
